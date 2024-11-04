@@ -1,0 +1,16 @@
+Name:Jumanji;Service:Prime Video;Genre:Action;Rating:8;IMDbLink:https://www.imdb.com/title/tt2283362/;_
+Name:World War Z;Service:Prime Video;Genre:Horror;Rating:7;ReleaseDate:21st June 2013;IMDbLink:https://www.imdb.com/title/tt0816711/;_
+Name:Wonka;Service:Prime Video;Genre:Musical;Rating:8;ReleaseDate:8th December 2023;IMDbLink:https://www.imdb.com/title/tt6166392/;_
+Name:Back to the Future;Service:Prime Video;Genre:Sci-fi;Rating:9;ReleaseDate:4th December 1985;IMDbLink:https://www.imdb.com/title/tt0088763/;_
+Name:The Blair Witch Project;Service:Prime Video;Genre:Horror;Rating:8;_
+Name:The Hunger Games;Service:Netflix;Genre:Action;Rating:9;_
+Name:The Maze Runner;Service:Netflix;Genre:Action;Rating:9;_
+Name:Cars;Service:Disney +;Genre:Animated;Rating:8;ReleaseDate:9th June 2006;IMDbLink:https://www.imdb.com/title/tt0317219/;_
+Name:Geostorm;Service:Netflix;Genre:Sci-fi;Rating:6;ReleaseDate:20th October 2017;IMDbLink:https://www.imdb.com/title/tt1981128/;_
+Name:The Walking Dead;Service:Prime Video;Genre:Action;Rating:8;ReleaseDate:5th November 2010;IMDbLink:https://www.imdb.com/title/tt1520211/;_
+Name:House M.D.;Service:Prime Video;Genre:Drama;Rating:9;ReleaseDate:9th June 2005;IMDbLink:https://www.imdb.com/title/tt0412142/;_
+Name:The Office;Service:Netflix;Genre:Drama;Rating:9;ReleaseDate:14th June 2005:IMDbLink:https://www.imdb.com/title/tt0386676/;_
+Name:The Mandalorian;Service:Disney +;Genre:Sci-fi;Rating:9;ReleaseDate:24th March 2020;IMDbLink:https://www.imdb.com/title/tt8111088/;_
+Name:The Last of Us;Service:HBO Max;Genre:Horror;Rating:9;ReleaseDate:15th January 2023;IMDbLink:https://www.imdb.com/title/tt3581920/;_
+Name:Before;Service:Apple TV;Genre:Drama;Rating:7;ReleaseDate:25th October 2024;IMDbLink:https://www.imdb.com/title/tt13332622/;_
+Name:Bumblebee;Service:Paramount +;Genre:Sci-fi;Rating:7;ReleaseDate:26th December 2018;IMDbLink:https://www.imdb.com/title/tt4701182/;_

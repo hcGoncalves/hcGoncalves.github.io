@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css">
+    <title>WhereToWatch - Main</title>
+
+    <script>
+      function showSort(sortBy) {
+        if (sortBy == "Genres") {
+          if (document.getElementById("GenresDiv").style.display == "none") {
+            document.getElementById("GenresDiv").style.display = "inline-block";
+          } else {
+            document.getElementById("GenresDiv").style.display = "none";
+          } 
+
+          document.getElementById("ServicesDiv").style.display = "none";
+        } else if (sortBy == "Services") {
+          if (document.getElementById("ServicesDiv").style.display == "none") {
+            document.getElementById("ServicesDiv").style.display = "inline-block";
+          } else {
+            document.getElementById("ServicesDiv").style.display = "none";
+          }
+
+          document.getElementById("GenresDiv").style.display = "none";
+        }
+      }
+    </script>
+
+    <script>
+      const filters = {"Genre" : "", "Service" : "", "Name" : ""};
+
+      function setFilter(filterName, filterValue) {
+        if (filters[filterName] === undefined) {console.warn("Unknown '" + filterName + "' filter used");}
+        else {filters[filterName] = filterValue;}
+
+        if (filterName == "Genre") {document.getElementById("GenresButton").innerText = filterValue;}
+        else if (filterName == "Service") {document.getElementById("ServicesButton").innerText = filterValue;}
+
+        getFilms();
+      }
+
+      function clearFilters(specific) {
+        if (specific === undefined) {
+          for (const [key, value] of Object.entries(filters)) {
+            filters[key] = "";
+          }
+
+          document.getElementById("GenresButton").innerText = "Genres";
+          document.getElementById("ServicesButton").innerText = "Streaming Services";
+          document.getElementById("searchBar").value = "";
+        } else {
+          if (specific == "Genre") {
+            filters["Genre"] = "";
+            document.getElementById("GenresButton").innerText = "Genres";
+          } else if (specific == "Service"){
+            filters["Service"] = "";
+            document.getElementById("ServicesButton").innerText = "Streaming Services";
+          }
+        }
+
+        getFilms();
+      }
+
+      const storedFilms = [];
+
+      function storeFilms() {
+        fetch("films.txt")
+          .then((res) => res.text())
+          .then((text) => {
+
+            let currentCommand = "";
+            let currentValues = {};
+
+            let findingCommand = true;
+
+            let filmName = "Undefined";
+            let service = "Undefined";
+            let genre = "Undefined";
+
+            for (let i = 0; i < text.length; i++) {
+              if (text.charAt(i) == ':') {
+                findingCommand=false; 
+                currentValue=""; 
+                continue;
+              }
+              else if (text.charAt(i) == ";") {
+                currentCommand = currentCommand.trim();
+                currentValue = currentValue.trim();
+
+                currentValues[currentCommand] = currentValue;
+
+                findingCommand=true; 
+                currentCommand=""; 
+                continue;
+              }
+              else if (text.charAt(i) == "_") {
+                storedFilms.push(currentValues);
+                currentValues = {};
+
+                continue;
+              }
+              
+              if (text.charCodeAt(i) < 32) {continue;}
+
+              if (findingCommand) {currentCommand += text.charAt(i)}
+              else {currentValue += text.charAt(i)}
+            }
+          })
+
+        .catch((e) => console.error(e))
+
+        setTimeout(getFilms, 150);
+      }
+
+      function getFilms() {
+        let deletedAll = false
+        while (!deletedAll) {
+          const foundPreview = document.getElementById("FilmPreview")
+
+          if (foundPreview) {
+            foundPreview.remove();
+      
+          } else {
+            deletedAll = true;
+          }
+        }
+
+        let resultsFound = 0
+        for (let i = 0; i < storedFilms.length; i++) {
+          let inFilter = true;
+
+          for (const [key, value] of Object.entries(filters)) {
+            if (value!="" && storedFilms[i][key].toLowerCase().includes(value.toLowerCase()) == false) {
+              inFilter = false;
+              break;
+            }
+          }
+
+          if (inFilter) {
+            resultsFound++;
+
+            const newPreview = document.createElement("div");
+            newPreview.setAttribute("id", "FilmPreview");
+            newPreview.setAttribute("class", "film-preview");
+            newPreview.onclick = function() {
+              showFilmDetail(storedFilms[i])
+            }
+
+            const newImage = document.createElement("img");
+
+            const desiredUrl = "graphics/filmImages/" + storedFilms[i].Name + ".jpeg"
+            const http = new XMLHttpRequest();
+            http.open("HEAD", desiredUrl, false);
+            http.send();
+
+            if (http.status==404) {
+              newImage.setAttribute("src", "graphics/assets/missingImage.png");
+            } else {
+              newImage.setAttribute("src", desiredUrl);
+            }
+
+            newImage.setAttribute("alt", "Essential assets missing");
+
+            newImage.setAttribute("style", "height:150px;");
+
+            const nameElement = document.createElement("p");
+            nameElement.setAttribute("class", "styled-text");
+            nameElement.setAttribute("style",  "width: 115px; margin:0; text-align: center; font-size: medium; text-overflow: ellipsis; white-space: nowrap; overflow:hidden;");
+            
+            nameElement.innerText = storedFilms[i].Name;
+
+            const detailsElement = document.createElement("p");
+            detailsElement.setAttribute("class", "styled-text");
+            detailsElement.setAttribute("style",  "width: 115px; margin:2px; text-align: center; font-size: small; white-space: nowrap; overflow:hidden;");
+
+            detailsElement.innerText = storedFilms[i].Service + "\n" + storedFilms[i].Genre;
+
+
+            newPreview.appendChild(newImage);
+            newPreview.appendChild(nameElement);
+            newPreview.appendChild(detailsElement);
+
+            const newIl = document.createElement("il")
+            newIl.appendChild(newPreview)
+
+            document.getElementById("FilmsList").appendChild(newIl);
+          }
+        }
+
+        document.getElementById("ResultsFoundPara").innerText = resultsFound + " Results Found";
+      }
+    </script>
+
+    <script>
+      function hideFilmDetail() {
+        filmDetail.setAttribute("class", "film-detail hide")
+      }
+
+      function showFilmDetail(details) {
+        const filmDetail = document.getElementById("filmDetail");
+
+        document.getElementById("filmDetailName").innerText = details.Name;
+        document.getElementById("filmDetailService").innerText = "Available on " + details.Service;
+        document.getElementById("filmDetailGenre").innerText = details.Genre + " Film";
+        document.getElementById("filmDetailRating").innerText = "Rating " + details.Rating + "/10";
+        
+        const filmDatePara = document.getElementById("filmDetailsDate");
+        if (details.ReleaseDate === undefined) {
+          filmDatePara.innerText = "Released Date: Missing";
+        } else {
+          filmDatePara.innerText = "Released Date: " + details.ReleaseDate;
+        }
+
+        const filmLinkElement = document.getElementById("filmDetailsIMDb");
+        if (details.IMDbLink === undefined) {
+          filmLinkElement.setAttribute("href", "");
+          filmLinkElement.setAttribute("style", "pointer-events: none;");
+
+          filmLinkElement.innerText = details.Name + " IMDb Link Unavailable";
+        } else {
+          filmLinkElement.setAttribute("href", details.IMDbLink);
+          filmLinkElement.setAttribute("style", "color:rgb(0,200,255); pointer-events: all;");
+
+          filmLinkElement.innerText = details.Name + " IMDb Link";
+        }
+
+        const filmImage = document.getElementById("filmDetailImage");
+
+        const desiredUrl = "graphics/filmImages/" + details.Name + ".jpeg";
+        const http = new XMLHttpRequest();
+        http.open("HEAD", desiredUrl, false);
+        http.send();
+
+        if (http.status==404) {
+          filmImage.setAttribute("src", "graphics/assets/missingImage.png");
+        } else {
+          filmImage.setAttribute("src", desiredUrl);
+        }
+
+        filmDetail.setAttribute("class", "film-detail show");
+      }
+    </script>
+  </head>
+
+  <body onload="storeFilms()">
+  
+    <div id="navDiv" class="nav-div">
+      <h1 class="page-title" >Where To Watch</h1>
+      <div>
+        <input id="searchBar" type="text" class="search-bar" placeholder="Search"/>
+
+        <button id="searchButton" class="styled-button" onclick="clearFilters('Genre'); clearFilters('Service'); setFilter('Name',document.getElementById('searchBar').value)">></button>
+
+        <script>
+          document.getElementById("searchBar").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              document.getElementById("searchButton").click();
+            }
+          })
+        </script>
+      </div>
+    </div>
+
+    <div style="display: inline-block; padding: 2px">
+      <button id="GenresButton" class="styled-button" onclick="showSort('Genres')">Genres</button>
+      <button id="ServicesButton" class="styled-button" onclick="showSort('Services')">Streaming Services</button>
+      <button id="ClearFiltersButton" class="styled-button" onclick="clearFilters()">Clear Filters</button>
+    </div>
+
+    <div id="GenresDiv" class="sort-div">
+      <button class="styled-button" onclick="setFilter('Genre', 'Action')">Action</button>
+      <button class="styled-button" onclick="setFilter('Genre','Adventure')">Adventure</button>
+      <button class="styled-button" onclick="setFilter('Genre','Fantasy')">Fantasy</button>
+      <button class="styled-button" onclick="setFilter('Genre','Sci-fi')">Sci-fi</button>
+      <button class="styled-button" onclick="setFilter('Genre','Animated')">Animated</button>
+      <button class="styled-button" onclick="setFilter('Genre','Comedy')">Comedy</button>
+      <button class="styled-button" onclick="setFilter('Genre','Musical')">Musical</button>
+      <button class="styled-button" onclick="setFilter('Genre','Romance')">Romance</button>
+      <button class="styled-button" onclick="setFilter('Genre','Horror')">Horror</button>
+      <button class="styled-button" onclick="setFilter('Genre','Drama')">Drama</button>
+      <button class="styled-button" onclick="clearFilters('Genre')">Any Genre</button>
+    </div>
+
+    <div id="ServicesDiv" class="sort-div">
+      <button class="styled-button" onclick="setFilter('Service','Netflix')">Netflix</button>
+      <button class="styled-button" onclick="setFilter('Service','Prime Video')">Prime Video</button>
+      <button class="styled-button" onclick="setFilter('Service','Disney +')">Disney +</button>
+      <button class="styled-button" onclick="setFilter('Service','Apple TV')">Apple TV</button>
+      <button class="styled-button" onclick="setFilter('Service','HBO Max')">HBO Max</button>
+      <button class="styled-button" onclick="setFilter('Service','Paramount +')">Paramount +</button>
+      <button class="styled-button" onclick="clearFilters('Service')">Any Service</button>
+    </div>
+
+
+      <ul id="FilmsList" class="films-div">
+        <p id="ResultsFoundPara" class="styled-text" style="font-size: medium; font-weight: normal; text-align: center;">Loading Results...</p>
+      </ul>
+
+      <div id="filmDetail" class="film-detail hide">
+        <img id="filmDetailImage" src="graphics/filmImages/Jumanji.jpeg" class="film-image-detail" />
+
+        <button class="styled-static-button" style="position: absolute; top:0%; left:0%; border-top-left-radius: 15px;" onclick="hideFilmDetail()">X</button>
+
+        <div style="position: absolute; top: 5px; left:255px; width:245px;">
+          <p id="filmDetailName" class="styled-text" style="text-align: center;">Jumanji</p>
+          <p id="filmDetailService" class="styled-text" style="text-align: center;">Available on Netflix</p>
+          <p id="filmDetailGenre" class="styled-text" style="text-align: center;">Action Film</p>
+          <p id="filmDetailRating" class="styled-text" style="text-align: center;">Rating: 3/5</p>
+        </div>
+
+        <div style="margin:10px;">
+          <p id="filmDetailsDate" class="styled-text"></p>
+          <a id="filmDetailsIMDb" href="" target="_blank" class="styled-text" style="pointer-events: none;">IMDb Link</a>
+        </div>
+      </div>
+
+  </body>
+</html>
