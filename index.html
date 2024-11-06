@@ -2,244 +2,9 @@
 <html>
   <head>
     <link rel="stylesheet" href="style.css">
+    <script src="utility.js"></script>
+
     <title>WhereToWatch - Main</title>
-
-    <script>
-      function showSort(sortBy) {
-        if (sortBy == "Genres") {
-          if (document.getElementById("GenresDiv").style.display == "none") {
-            document.getElementById("GenresDiv").style.display = "inline-block";
-          } else {
-            document.getElementById("GenresDiv").style.display = "none";
-          } 
-
-          document.getElementById("ServicesDiv").style.display = "none";
-        } else if (sortBy == "Services") {
-          if (document.getElementById("ServicesDiv").style.display == "none") {
-            document.getElementById("ServicesDiv").style.display = "inline-block";
-          } else {
-            document.getElementById("ServicesDiv").style.display = "none";
-          }
-
-          document.getElementById("GenresDiv").style.display = "none";
-        }
-      }
-    </script>
-
-    <script>
-      const filters = {"Genre" : "", "Service" : "", "Name" : ""};
-
-      function setFilter(filterName, filterValue) {
-        if (filters[filterName] === undefined) {console.warn("Unknown '" + filterName + "' filter used");}
-        else {filters[filterName] = filterValue;}
-
-        if (filterName == "Genre") {document.getElementById("GenresButton").innerText = filterValue;}
-        else if (filterName == "Service") {document.getElementById("ServicesButton").innerText = filterValue;}
-
-        getFilms();
-      }
-
-      function clearFilters(specific) {
-        if (specific === undefined) {
-          for (const [key, value] of Object.entries(filters)) {
-            filters[key] = "";
-          }
-
-          document.getElementById("GenresButton").innerText = "Genres";
-          document.getElementById("ServicesButton").innerText = "Streaming Services";
-          document.getElementById("searchBar").value = "";
-        } else {
-          if (specific == "Genre") {
-            filters["Genre"] = "";
-            document.getElementById("GenresButton").innerText = "Genres";
-          } else if (specific == "Service"){
-            filters["Service"] = "";
-            document.getElementById("ServicesButton").innerText = "Streaming Services";
-          }
-        }
-
-        getFilms();
-      }
-
-      const storedFilms = [];
-
-      function storeFilms() {
-        fetch("films.txt")
-          .then((res) => res.text())
-          .then((text) => {
-
-            let currentCommand = "";
-            let currentValues = {};
-
-            let findingCommand = true;
-
-            let filmName = "Undefined";
-            let service = "Undefined";
-            let genre = "Undefined";
-
-            for (let i = 0; i < text.length; i++) {
-              if (text.charAt(i) == ':') {
-                findingCommand=false; 
-                currentValue=""; 
-                continue;
-              }
-              else if (text.charAt(i) == ";") {
-                currentCommand = currentCommand.trim();
-                currentValue = currentValue.trim();
-
-                currentValues[currentCommand] = currentValue;
-
-                findingCommand=true; 
-                currentCommand=""; 
-                continue;
-              }
-              else if (text.charAt(i) == "_") {
-                storedFilms.push(currentValues);
-                currentValues = {};
-
-                continue;
-              }
-              
-              if (text.charCodeAt(i) < 32) {continue;}
-
-              if (findingCommand) {currentCommand += text.charAt(i)}
-              else {currentValue += text.charAt(i)}
-            }
-          })
-
-        .catch((e) => console.error(e))
-
-        setTimeout(getFilms, 150);
-      }
-
-      function getFilms() {
-        let deletedAll = false
-        while (!deletedAll) {
-          const foundPreview = document.getElementById("FilmPreview")
-
-          if (foundPreview) {
-            foundPreview.remove();
-      
-          } else {
-            deletedAll = true;
-          }
-        }
-
-        let resultsFound = 0
-        for (let i = 0; i < storedFilms.length; i++) {
-          let inFilter = true;
-
-          for (const [key, value] of Object.entries(filters)) {
-            if (value!="" && storedFilms[i][key].toLowerCase().includes(value.toLowerCase()) == false) {
-              inFilter = false;
-              break;
-            }
-          }
-
-          if (inFilter) {
-            resultsFound++;
-
-            const newPreview = document.createElement("div");
-            newPreview.setAttribute("id", "FilmPreview");
-            newPreview.setAttribute("class", "film-preview");
-            newPreview.onclick = function() {
-              showFilmDetail(storedFilms[i])
-            }
-
-            const newImage = document.createElement("img");
-
-            const desiredUrl = "graphics/filmImages/" + storedFilms[i].Name + ".jpeg"
-            const http = new XMLHttpRequest();
-            http.open("HEAD", desiredUrl, false);
-            http.send();
-
-            if (http.status==404) {
-              newImage.setAttribute("src", "graphics/assets/missingImage.png");
-            } else {
-              newImage.setAttribute("src", desiredUrl);
-            }
-
-            newImage.setAttribute("alt", "Essential assets missing");
-
-            newImage.setAttribute("style", "height:150px;");
-
-            const nameElement = document.createElement("p");
-            nameElement.setAttribute("class", "styled-text");
-            nameElement.setAttribute("style",  "width: 115px; margin:0; text-align: center; font-size: medium; text-overflow: ellipsis; white-space: nowrap; overflow:hidden;");
-            
-            nameElement.innerText = storedFilms[i].Name;
-
-            const detailsElement = document.createElement("p");
-            detailsElement.setAttribute("class", "styled-text");
-            detailsElement.setAttribute("style",  "width: 115px; margin:2px; text-align: center; font-size: small; white-space: nowrap; overflow:hidden;");
-
-            detailsElement.innerText = storedFilms[i].Service + "\n" + storedFilms[i].Genre;
-
-
-            newPreview.appendChild(newImage);
-            newPreview.appendChild(nameElement);
-            newPreview.appendChild(detailsElement);
-
-            const newIl = document.createElement("il")
-            newIl.appendChild(newPreview)
-
-            document.getElementById("FilmsList").appendChild(newIl);
-          }
-        }
-
-        document.getElementById("ResultsFoundPara").innerText = resultsFound + " Results Found";
-      }
-    </script>
-
-    <script>
-      function hideFilmDetail() {
-        filmDetail.setAttribute("class", "film-detail hide")
-      }
-
-      function showFilmDetail(details) {
-        const filmDetail = document.getElementById("filmDetail");
-
-        document.getElementById("filmDetailName").innerText = details.Name;
-        document.getElementById("filmDetailService").innerText = "Available on " + details.Service;
-        document.getElementById("filmDetailGenre").innerText = details.Genre + " Film";
-        document.getElementById("filmDetailRating").innerText = "Rating " + details.Rating + "/10";
-        
-        const filmDatePara = document.getElementById("filmDetailsDate");
-        if (details.ReleaseDate === undefined) {
-          filmDatePara.innerText = "Released Date: Missing";
-        } else {
-          filmDatePara.innerText = "Released Date: " + details.ReleaseDate;
-        }
-
-        const filmLinkElement = document.getElementById("filmDetailsIMDb");
-        if (details.IMDbLink === undefined) {
-          filmLinkElement.setAttribute("href", "");
-          filmLinkElement.setAttribute("style", "pointer-events: none;");
-
-          filmLinkElement.innerText = details.Name + " IMDb Link Unavailable";
-        } else {
-          filmLinkElement.setAttribute("href", details.IMDbLink);
-          filmLinkElement.setAttribute("style", "color:rgb(0,200,255); pointer-events: all;");
-
-          filmLinkElement.innerText = details.Name + " IMDb Link";
-        }
-
-        const filmImage = document.getElementById("filmDetailImage");
-
-        const desiredUrl = "graphics/filmImages/" + details.Name + ".jpeg";
-        const http = new XMLHttpRequest();
-        http.open("HEAD", desiredUrl, false);
-        http.send();
-
-        if (http.status==404) {
-          filmImage.setAttribute("src", "graphics/assets/missingImage.png");
-        } else {
-          filmImage.setAttribute("src", desiredUrl);
-        }
-
-        filmDetail.setAttribute("class", "film-detail show");
-      }
-    </script>
   </head>
 
   <body onload="storeFilms()">
@@ -293,11 +58,12 @@
     </div>
 
 
-      <ul id="FilmsList" class="films-div">
+      <ul id="FilmsList" class="container-div">
+        <header id="filter-header" class="styled-text header-text">Browse All of the Films and Shows</header>
         <p id="ResultsFoundPara" class="styled-text" style="font-size: medium; font-weight: normal; text-align: center;">Loading Results...</p>
       </ul>
 
-      <div id="filmDetail" class="film-detail hide">
+      <div id="filmDetail" class="film-detail hide" style="top:25px;">
         <img id="filmDetailImage" src="graphics/filmImages/Jumanji.jpeg" class="film-image-detail" />
 
         <button class="styled-static-button" style="position: absolute; top:0%; left:0%; border-top-left-radius: 15px;" onclick="hideFilmDetail()">X</button>
@@ -314,6 +80,47 @@
           <a id="filmDetailsIMDb" href="" target="_blank" class="styled-text" style="pointer-events: none;">IMDb Link</a>
         </div>
       </div>
+
+      <header class="styled-text header-text" style="margin-top: 25px; box-shadow: none;">WTW Awards</header>
+      <div class="container-div">
+        <div class="container-div">
+          <header class="styled-text header-text">Most Rewatchable Award</header>
+          <p class="styled-text" style="font-size: xx-large; margin-top: 15px; margin-bottom: 5px;">The Walking Dead</p>
+
+          <header class="styled-text header-text">Best Sci-fi Adaptation Award</header>
+          <p class="styled-text" style="font-size: xx-large; margin-top: 15px; margin-bottom: 5px;">The Madalorian</p>
+
+          <header class="styled-text header-text">Ahead of Its Time Award</header>
+          <p class="styled-text" style="font-size: xx-large; margin-top: 15px; margin-bottom: 5px;">Back to the Future</p>
+        </div>
+      </div>
+
+      <footer style="text-align: center;">
+        <p class="styled-text" style="font-weight: normal;">
+          Sources:<br>
+          <a href="https://www.imdb.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">IMDb</a>&nbsp
+          <a href="https://www.netflix.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">Netflix</a>&nbsp
+          <a href="https://www.amazon.com/video/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">Prime Video</a>&nbsp
+          <a href="https://www.sonypictures.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">Columbia Pictures/Sony Pictures</a>&nbsp 
+          <a href="https://www.paramountstudios.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">Paramount Studios</a>&nbsp
+          <a href="https://www.max.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">HBO Max</a>&nbsp
+          <a href="https://tv.apple.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">Apple TV</a>&nbsp
+          <a href="https://www.warnerbros.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">Warner Bros.</a>&nbsp
+          <a href="https://amblin.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">Amblin Entertainment</a>&nbsp
+          <a href="https://www.universalpictures.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">Universal Pictures</a>&nbsp
+          <a href="http://www.haxan.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">Haxan Films</a>&nbsp
+          <a href="https://www.lionsgate.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">Lionsgate</a>&nbsp
+          <a href="https://gotham-group.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">The Gotham Group</a>&nbsp
+          <a href="https://www.20thcenturystudios.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">20th Century Studios</a>&nbsp
+          <a href="https://www.pixar.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">Pixar Animation Studios</a>&nbsp
+          <a href="https://www.disney.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">Disney</a>&nbsp
+          <a href="https://www.amcnetworks.com/amc-studios/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">AMC Studios</a>&nbsp
+          <a href="https://www.nbcuniversal.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">NBC Universal</a>&nbsp
+          <a href="https://www.lucasfilm.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">Lucasfilm</a>
+        </p>
+
+        <p class="styled-text" style="font-weight: normal; font-size: small;">2024 WhereToWatch, a HTML Project</p>
+      </footer>
 
   </body>
 </html>
