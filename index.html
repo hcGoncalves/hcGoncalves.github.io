@@ -7,10 +7,11 @@
     <title>WhereToWatch - Main</title>
   </head>
 
-  <body onload="storeFilms()">
+  <body class="body" onload="setup()">
   
-    <div id="navDiv" class="nav-div">
+    <div id="nav-div" class="nav-div">
       <h1 class="page-title" >Where To Watch</h1>
+
       <div>
         <input id="searchBar" type="text" class="search-bar" placeholder="Search"/>
 
@@ -64,9 +65,9 @@
       </ul>
 
       <div id="filmDetail" class="film-detail hide" style="top:25px;">
-        <img id="filmDetailImage" src="graphics/filmImages/Jumanji.jpeg" class="film-image-detail" />
+        <img id="filmDetailImage" src="graphics/filmImages/Jumanji.jpeg" class="film-image-detail" onerror="imgError(this)" />
 
-        <button class="styled-static-button" style="position: absolute; top:0%; left:0%; border-top-left-radius: 15px;" onclick="hideFilmDetail()">X</button>
+        <button class="styled-static-button" style="position: absolute; top:0%; left:0%;" onclick="hideFilmDetail()">X</button>
 
         <div style="position: absolute; top: 5px; left:255px; width:245px;">
           <p id="filmDetailName" class="styled-text" style="text-align: center;">Jumanji</p>
@@ -78,6 +79,8 @@
         <div style="margin:10px;">
           <p id="filmDetailsDate" class="styled-text"></p>
           <a id="filmDetailsIMDb" href="" target="_blank" class="styled-text" style="pointer-events: none;">IMDb Link</a>
+
+          <iframe id="trailer-player" width="480" height="270" src="" frameborder="0" allowfullscreen style="margin-top: 15px;"></iframe>
         </div>
       </div>
 
@@ -96,6 +99,16 @@
       </div>
 
       <footer style="text-align: center;">
+        <div style="display: flex; justify-content:space-around;">
+          <div class="container-div" style="text-align: center;">
+            <p class="styled-text" style="margin-bottom: 5px;">Light/Dark Mode</p>
+            <label class="switch">
+              <input id="light-mode-input" type="checkbox" data-theme-toggle>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        
         <p class="styled-text" style="font-weight: normal;">
           Sources:<br>
           <a href="https://www.imdb.com/" target="_blank" style="font-weight: normal;" class="styled-text underline-hover">IMDb</a>&nbsp
