@@ -75,7 +75,7 @@ html {overflow-y: scroll; overflow-x: hidden;}
 .search-bar {
     opacity: 0.9;
     background-color: var(--color-lighter);
-    color: var(--color-deeper);
+    color: var(--color-text);
     font-weight: lighter;
     font-size: small;
 
