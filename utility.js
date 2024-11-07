@@ -140,7 +140,7 @@ function storeFilms() {
 
     .catch((e) => console.error(e))
 
-    setTimeout(getFilms, 150);
+    setTimeout(getFilms, 350);
     }
 
 function getFilms() {
