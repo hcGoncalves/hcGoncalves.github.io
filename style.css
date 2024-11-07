@@ -1,15 +1,47 @@
 html {overflow-y: scroll; overflow-x: hidden;}
 
-body {
-    background-color: rgb(25, 25, 25);
-    background-image: linear-gradient(to bottom, black, rgb(25, 25, 25));
+[data-theme="light"] {
+    --color-deepest: white;
+    --color-deeper: rgb(230,230,230);
+    --color-lighter: rgb(205,205,205);
+    --color-even-lighter: rgb(175,175,175);
+    --color-container-div: rgb(215,215,215);
+
+    --color-text: black;
+    --color-text-shadow: rgba(0,0,0, 0);
+
+    --color-red-theme: rgb(225,0,0);
+    --color-red-extra-theme: rgb(175,0,0);
+    --color-red-hover-theme: rgb(255, 0, 0);
+}
+
+[data-theme="dark"] {
+    --color-deepest: black;
+    --color-deeper: rgb(25,25,25);
+    --color-lighter: rgb(50,50,50);
+    --color-even-lighter: rgb(80,80,80);
+    --color-container-div: rgba(255,255,255, 0.1);
+
+    --color-text: white;
+    --color-text-shadow: black;
+
+    --color-red-theme: rgb(255,0,0);
+    --color-red-extra-theme: rgba(255,0,0, 0.5);
+    --color-red-hover-theme: rgb(255, 50, 0);
+}
+
+.body {
+    display: block;
+    
+    background-color: var(--color-deeper);
+    background-image: linear-gradient(to bottom, var(--color-deepest), var(--color-deeper));
     
     background-repeat: no-repeat;
 }
 
 .nav-div {
-    background-color: rgba(0, 0, 0, 1);
-    border-color: rgba(50,50,50,1);
+    background-color: var(--color-deepest);
+    border-color: var(--color-lighter);
 
     border-bottom-style: solid;
     border-width: 1px;
@@ -29,15 +61,21 @@ body {
     font-size: xx-large;
     font-family:Arial, Helvetica, sans-serif;
     font-weight: bold;
-    color: rgb(255,0,0);
+    color: var(--color-red-theme);
 
-    text-shadow: 2px 5px rgba(255, 0, 0, 0.5);
+    text-shadow: 2px 5px 1px var(--color-red-extra-theme);
+
+    transition: all 0.5s;
+}
+
+.page-title:hover {
+    text-shadow: -2px -5px 1px var(--color-red-extra-theme);
 }
 
 .search-bar {
     opacity: 0.9;
-    background-color: rgba(50, 50, 50, 0.75);
-    color: white;
+    background-color: var(--color-lighter);
+    color: var(--color-deeper);
     font-weight: lighter;
     font-size: small;
 
@@ -45,7 +83,7 @@ body {
     height: 25px;
     font-size: large;
 
-    border-color: rgb(77, 77, 77);
+    border-color: var(--color-even-lighter);
     border-style: solid;
     border-width: 1px;
     border-radius: 5px;
@@ -59,7 +97,7 @@ body {
 
 .search-bar:focus {
     width: 250px;
-    border-color: rgb(255, 255, 255);
+    border-color: var(--color-deepest);
 }
 
 .styled-static-button {
@@ -70,11 +108,11 @@ body {
     padding-left: 10px;
     padding-right: 10px;
 
-    color: white;
+    color: var(--color-text);
     font-weight: 500;
     font-size: larger;
-    text-shadow: 1px 1px 0px rgba(0,0,0,1);
-    background-color: rgb(255, 0, 0);
+    text-shadow: 1px 1px 0px var(--color-text-shadow);
+    background-color: var(--color-red-theme);
     border: none;
     border-radius: 5px;
 
@@ -84,7 +122,7 @@ body {
 }
 
 .styled-static-button:hover {
-    background-color: rgb(255, 50, 0);
+    background-color: var(--color-red-hover-theme);
 }
 
 
@@ -97,15 +135,15 @@ body {
     padding-left: 10px;
     padding-right: 10px;
 
-    color: white;
+    color: var(--color-text);
     font-weight: 500;
     font-size: larger;
-    text-shadow: 1px 1px 0px rgba(0,0,0,1);
-    background-color: rgb(255, 0, 0);
+    text-shadow: 1px 1px 0px var(--color-text-shadow);
+    background-color: var(--color-red-theme);
     border: none;
     border-radius: 5px;
 
-    box-shadow: 5px 5px rgba(255, 0, 0, 0.5);
+    box-shadow: 5px 5px var(--color-red-extra-theme);
 
     cursor: pointer;
 
@@ -113,13 +151,13 @@ body {
 }
 
 .styled-button:hover {
-    background-color: rgb(255, 50, 0);
+    background-color: var(--color-red-hover-theme);
     margin-left: 1px;
     margin-right: 1px;
     padding-left: 16px;
     padding-right: 16px;
 
-    box-shadow: 8px 5px rgba(255, 50, 0, 0.5);
+    box-shadow: 8px 5px var(--color-red-extra-theme);
 }
 
 .styled-text {
@@ -129,7 +167,7 @@ body {
     font-family:Arial, Helvetica, sans-serif;
     font-weight: bold;
     font-size: large;
-    color: rgb(255,255,255);
+    color: var(--color-text);
 }
 
 .styled-text.styled-text.underline-hover {
@@ -141,14 +179,14 @@ body {
 }
 
 .styled-text.header-text {
-    background-color: rgb(50,50,50); 
+    background-color: var(--color-lighter); 
     font-size: xx-large; border-radius: 10px; 
     padding: 5px;
     padding-left: 15px; padding-right: 15px;
     margin-right: 5px;
 
-    box-shadow: 5px 5px rgb(25,25,25);
-    text-shadow: 5px 5px black;
+    box-shadow: 5px 5px var(--color-even-lighter);
+    text-shadow: 5px 5px var(--color-text-shadow);
 }
 
 .sort-div {
@@ -158,10 +196,12 @@ body {
 
     padding-bottom: 10px;
     padding-top: 10px;
-    border-top-color: rgba(50,50,50,1);
-    border-bottom-color: rgba(50,50,50,1);
-    border-style: solid;
+    border-top-color: var(--color-container-div);
+    border-bottom-color: var(--color-lighter);
+
     border-width: 1px;
+    border-left-width: 0; border-right-width: 0;
+    border-style: solid;
 
 }
 
@@ -169,7 +209,7 @@ body {
     padding: 10px;
     height: 75%;
 
-    background-color: rgba(255,255,255,0.1);
+    background-color: var(--color-container-div);
     margin: 5px auto;
     text-align: left;
 
@@ -186,13 +226,13 @@ body {
 
     margin: 8px;
     text-align: center;
-    background-color: rgba(25,25,25,1);
+    background-color: var(--color-deeper);
 
     border-radius: 5px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
 
-    box-shadow: 5px 5px rgba(255,255,255,0.1);
+    box-shadow: 5px 5px var(--color-even-lighter);
 
     cursor: pointer;
 
@@ -201,18 +241,23 @@ body {
 
 .film-preview:hover {
     padding-left: 10px; padding-right: 10px;
-    background-color: rgba(50,50,50,1);
+    background-color: var(--color-lighter);
 
-    box-shadow: 10px 10px rgba(255,255,255,0.1);
+    box-shadow: 10px 10px var(--color-even-lighter);
 }
 
 .film-detail {
     position: absolute;
     width: 500px;
-    height:80%;
+
+    z-index: 10;
 
     border-top-left-radius: 15px; border-bottom-left-radius: 15px;
-    background-color: rgb(25,25,25);
+    background-color: var(--color-deeper);
+
+    border-style: solid;
+    border-color: var(--color-lighter);
+    border-width: 5px;
 
     transition: all 0.5s;
 }
@@ -222,11 +267,67 @@ body {
 }
 
 .film-detail.hide {
-    left: 100%;
+    left: 150%;
 }
 
 .film-image-detail {
     width:250px;
     margin: 5px;
     border-top-left-radius: 15px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 25px;
+    margin: 5px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: rgb(205,205,205);
+    border-radius: 5px;
+
+    transition: 0.4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 17px;
+    width: 17px;
+    left: 4px;
+    bottom: 4px;
+
+    background-color: black;
+    border-radius: 5px;
+
+    transition: 0.4s;
+}
+
+input:checked + .slider {
+    background-color: rgb(50,50,50);
+}
+
+input:hover + .slider {
+    box-shadow: 0px 0px 5px white;
+}
+
+input:checked + .slider:before {
+    transform: translateX(17px);
+    
+    background-color: white;
 }
