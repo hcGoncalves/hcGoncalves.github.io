@@ -1,3 +1,40 @@
+function setup() {
+    const localStorageTheme = localStorage.getItem("theme");
+
+    const systemSettingDark = window.matchMedia("(prefers-color-scheme: dark)");
+    let currentThemeSetting = calculateSettingAsThemeString({localStorageTheme, systemSettingDark})
+    document.querySelector("html").setAttribute("data-theme", currentThemeSetting);
+
+    if (currentThemeSetting == "light") {
+        document.querySelector("[data-theme-toggle]").checked = true;
+    }
+
+    const input = document.querySelector("[data-theme-toggle]");
+    input.addEventListener("click", () => {
+        const newTheme = input.checked === true ? "light" : "dark";
+
+        document.querySelector("html").setAttribute("data-theme", newTheme);
+
+        localStorage.setItem("theme", newTheme);
+        currentThemeSetting = newTheme;
+    })
+
+
+    storeFilms()
+}
+
+function calculateSettingAsThemeString({localStorageTheme, systemSettingDark}) {
+    if (localStorageTheme !== null) {
+        return localStorageTheme
+    }
+
+    if (systemSettingDark.matches) {
+        return "dark";
+    } else {
+        return "light";
+    }
+}
+
 function showSort(sortBy) {
     if (sortBy == "Genres") {
       if (document.getElementById("GenresDiv").style.display == "none") {
@@ -87,7 +124,7 @@ function storeFilms() {
                 currentCommand=""; 
                 continue;
             }
-            else if (text.charAt(i) == "_") {
+            else if (text.charAt(i) == "~") {
                 storedFilms.push(currentValues);
                 currentValues = {};
 
@@ -141,8 +178,9 @@ function getFilms() {
             resultsFound++;
 
             const newPreview = document.createElement("div");
-            newPreview.setAttribute("id", "FilmPreview");
-            newPreview.setAttribute("class", "film-preview");
+            newPreview.id = "FilmPreview";
+            newPreview.className = "film-preview";
+
             newPreview.onclick = function() {
                 showFilmDetail(storedFilms[i])
             }
@@ -150,29 +188,21 @@ function getFilms() {
             const newImage = document.createElement("img");
 
             const desiredUrl = "graphics/filmImages/" + storedFilms[i].Name + ".jpeg"
-            const http = new XMLHttpRequest();
-            http.open("HEAD", desiredUrl, false);
-            http.send();
+            newImage.src = desiredUrl;
 
-            if (http.status==404) {
-                newImage.setAttribute("src", "graphics/assets/missingImage.png");
-            } else {
-                newImage.setAttribute("src", desiredUrl);
-            }
-
-            newImage.setAttribute("alt", "Essential assets missing");
-
-            newImage.setAttribute("style", "height:150px;");
+            newImage.alt = "Essential assets missing";
+            newImage.style = "height:150px;";
+            newImage.setAttribute("onerror", "imgError(this)");
 
             const nameElement = document.createElement("p");
-            nameElement.setAttribute("class", "styled-text");
-            nameElement.setAttribute("style",  "width: 115px; margin:0; text-align: center; font-size: medium; text-overflow: ellipsis; white-space: nowrap; overflow:hidden;");
-            
+            nameElement.className = "styled-text";
+            nameElement.style = "width: 115px; margin:0; text-align: center; font-size: medium; text-overflow: ellipsis; white-space: nowrap; overflow:hidden;";
+
             nameElement.innerText = storedFilms[i].Name;
 
             const detailsElement = document.createElement("p");
-            detailsElement.setAttribute("class", "styled-text");
-            detailsElement.setAttribute("style",  "width: 115px; margin:2px; text-align: center; font-size: small; white-space: nowrap; overflow:hidden;");
+            detailsElement.className = "styled-text";
+            detailsElement.style = "width: 115px; margin:2px; text-align: center; font-size: small; white-space: nowrap; overflow:hidden;";
 
             detailsElement.innerText = storedFilms[i].Service + "\n" + storedFilms[i].Genre;
 
@@ -192,7 +222,9 @@ function getFilms() {
 }
 
 function hideFilmDetail() {
-    filmDetail.setAttribute("class", "film-detail hide")
+    filmDetail.className = "film-detail hide";
+    document.getElementById("filmDetailImage").setAttribute("src", "graphics/assets/missingImage.png");
+    document.getElementById("trailer-player").setAttribute("src", "");
 }
 
 function showFilmDetail(details) {
@@ -212,35 +244,37 @@ function showFilmDetail(details) {
 
     const filmLinkElement = document.getElementById("filmDetailsIMDb");
     if (details.IMDbLink === undefined) {
-      filmLinkElement.setAttribute("href", "");
-      filmLinkElement.setAttribute("style", "pointer-events: none;");
+      filmLinkElement.href = ""
+      filmLinkElement.style = "pointer-events: none;";
 
       filmLinkElement.innerText = details.Name + " IMDb Link Unavailable";
     } else {
-      filmLinkElement.setAttribute("href", details.IMDbLink);
-      filmLinkElement.setAttribute("style", "color:rgb(0,200,255); pointer-events: all;");
+      filmLinkElement.href = details.IMDbLink;
+      filmLinkElement.style = "color:rgb(0,200,255); pointer-events: all;";
 
       filmLinkElement.innerText = details.Name + " IMDb Link";
     }
 
-    const filmImage = document.getElementById("filmDetailImage");
-
-    const desiredUrl = "graphics/filmImages/" + details.Name + ".jpeg";
-    const http = new XMLHttpRequest();
-    http.open("HEAD", desiredUrl, false);
-    http.send();
-
-    if (http.status==404) {
-      filmImage.setAttribute("src", "graphics/assets/missingImage.png");
+    const filmTrailerPlayer = document.getElementById("trailer-player");
+    if (details.TrailerURL === undefined) {
+        filmTrailerPlayer.src = "";
     } else {
-      filmImage.setAttribute("src", desiredUrl);
+        filmTrailerPlayer.src = "https://www.youtube.com/embed/" + details.TrailerURL;
     }
 
-    filmDetail.setAttribute("class", "film-detail show");
+    const imageElement = document.getElementById("filmDetailImage");
+
+    const desiredUrl = "graphics/filmImages/" + details.Name + ".jpeg";
+    imageElement.src = desiredUrl
+
+    filmDetail.className = "film-detail show";
 }
 
 window.onscroll = function(e) {
     const formattedTop = `${window.scrollY+25}px`;
     document.getElementById("filmDetail").style.top = formattedTop;
-    console.log(formattedTop);
+}
+
+function imgError(img) {
+    img.setAttribute("src", "graphics/assets/missingImage.png");
 }
